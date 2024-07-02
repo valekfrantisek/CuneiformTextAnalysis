@@ -64,60 +64,76 @@ def simple_print_line_data(formatted_line_data:list):
     return line_text
 
 
-def get_formatted_text_from_table(input_table, column_rec_ver:str):
+def get_formatted_text_from_table(input_table, column_rec_ver:str, table_layout):
     """ This function analyses formatted text from the whole table. """
     full_formated_data_of_one_manuscript = {}
-    note_num = 1
-    
-    for row in input_table.rows:
-        for i, cell in enumerate(row.cells):
-            if cell.text == '':
-                """ If the cell is empty it is either in line for translation, or the next cell is a note for the manuscript. """
-                if i == 1:
-                    translation_row = True
-                    #print('translation row')
-                    next_cell_possible_note = False
-                    continue
-                elif i == 0:
-                    next_cell_possible_note = True
-                else:
-                    continue
-                
-            elif i == 1 and next_cell_possible_note:
-                """ If this is note to the manuscript, record it as such. """
-                full_formated_data_of_one_manuscript[f'note {note_num}'] = cell.text
-                next_cell_possible_note = False
-                note_num += 1
-                
-            elif i == 0:
-                """ If cell 0 is not empty, then it is a line designation. """
-                line_number_designation = cell.text
-                if '/' in line_number_designation:
-                    """ This means the text belongs to more manuscripts --> it will have to be divided later. """
-                    # TODO: place the division here or somewhere later (more likely!)
-                    continue
-                line_number_elements = line_number_designation.split(' ')
-                line_number = line_number_elements[-1]
-                manuscript = line_number_elements[0]
-                full_line_designation = sum_line_designation(manuscript=manuscript, column_rec_ver=column_rec_ver, line_num=line_number)
-                # print(full_line_designation)
-                
-                next_cell_possible_note = False
-                
-            else:
-                """ If it is the second cell and it has content and it is not the note, it is finally the text! """
-                cell_data = get_formatted_text_from_cell(input_cell_data=cell)
-                line_primary_analysis = []
-                for element in cell_data:
-                    element_info = assign_type(element)
-                    line_primary_analysis.append(element_info)
+        
+    if table_layout == 'lines':
+        note_num = 1
+        
+        for row in input_table.rows:
+            for i, cell in enumerate(row.cells):
+                if cell.text == '':
+                    """ If the cell is empty it is either in line for translation, or the next cell is a note for the manuscript. """
+                    if i == 1:
+                        translation_row = True
+                        #print('translation row')
+                        next_cell_possible_note = False
+                        continue
+                    elif i == 0:
+                        next_cell_possible_note = True
+                    else:
+                        continue
                     
-                # NOTE: record the line data with the line number
-                full_formated_data_of_one_manuscript[full_line_designation] = line_primary_analysis
-                
-                next_cell_possible_note = False
-                            
-    return full_formated_data_of_one_manuscript
+                elif i == 1 and next_cell_possible_note:
+                    """ If this is note to the manuscript, record it as such. """
+                    full_formated_data_of_one_manuscript[f'note {note_num}'] = cell.text
+                    next_cell_possible_note = False
+                    note_num += 1
+                    
+                elif i == 0:
+                    """ If cell 0 is not empty, then it is a line designation. """
+                    line_number_designation = cell.text
+                    if '/' in line_number_designation:
+                        """ This means the text belongs to more manuscripts --> it will have to be divided later. """
+                        # TODO: place the division here or somewhere later (more likely!)
+                        continue
+                    line_number_elements = line_number_designation.split(' ')
+                    line_number = line_number_elements[-1]
+                    manuscript = line_number_elements[0]
+                    full_line_designation = sum_line_designation(manuscript=manuscript, column_rec_ver=column_rec_ver, line_num=line_number)
+                    # print(full_line_designation)
+                    
+                    next_cell_possible_note = False
+                    
+                else:
+                    """ If it is the second cell and it has content and it is not the note, it is finally the text! """
+                    cell_data = get_formatted_text_from_cell(input_cell_data=cell)
+                    line_primary_analysis = []
+                    for element in cell_data:
+                        element_info = assign_type(element)
+                        line_primary_analysis.append(element_info)
+                        
+                    # NOTE: record the line data with the line number
+                    full_formated_data_of_one_manuscript[full_line_designation] = line_primary_analysis
+                    
+                    next_cell_possible_note = False
+                                
+        return full_formated_data_of_one_manuscript
+    
+    elif table_layout == 'columns':
+        print('In preparation')
+        return full_formated_data_of_one_manuscript
+    
+    elif table_layout == 'no_translation':
+        print('In preparation')
+        return full_formated_data_of_one_manuscript
+    
+    else:
+        print('Layout selection is not valid ...')
+        return None
+    
+    
 
 
 def get_headings_and_tables_from_document(input_document):
@@ -143,15 +159,12 @@ def get_headings_and_tables_from_document(input_document):
     return document_data
 
 
-def extract_data_from_composition_document(input_document:Document):
-    """ This function analyses document that contains transcriptions of cuneiform texts.
-    
-    It counts with headers that indicate the column of the composition and the transcription must be within two column table.
-    The headings must be unique.
-    Every second row must be empty (to include translation of the text in the future).
-    
-    Other functions will be prepared that deal with other outlines and other types of texts. """
+def extract_data_from_composition_document(input_path, layout):
+    """ This function analyses document that contains transcriptions of cuneiform texts. """
+    # TODO: provide detail description of this function
 
+    input_document = Document(input_path)
+    
     document_headings_et_tables = get_headings_and_tables_from_document(input_document=input_document)
     
     complete_analysed_document = {}
@@ -162,7 +175,7 @@ def extract_data_from_composition_document(input_document:Document):
 
         column_rec_ver = heading
     
-        full_formated_data_of_one_manuscript = get_formatted_text_from_table(input_table=table, column_rec_ver=column_rec_ver)
+        full_formated_data_of_one_manuscript = get_formatted_text_from_table(input_table=table, column_rec_ver=column_rec_ver, table_layout=layout)
         
         complete_analysed_document[heading] = full_formated_data_of_one_manuscript
         

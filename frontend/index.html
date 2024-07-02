@@ -1,21 +1,38 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuneiform Text Analyser</title>
+    <title>Akkadian Text Analyzer</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Cuneiform Text Analyser</h1>
+    <h1>Cuneiform Text Analyzer</h1>
     <div class="container">
         <div class="input-section">
-            <textarea id="input-text" placeholder="Insert transcription of a cuneiform text ..."></textarea>
+            <textarea id="input-text" placeholder="Enter or paste Akkadian text here..."></textarea>
             <input type="file" id="file-upload" accept=".docx">
-            <button id="analyze-button">Analyse</button>
+            <button id="upload-button" type="button">Upload</button>
+            <h2>Layout options</h2>
+                <p>For correct functionality, select the layout you use in the tables for the text in cuneiform, and for the translation.</p>
+            <div class="layout-options">
+                <div class="layout-option" data-layout="lines">
+                    <img src="images/layout_by_lines.png" alt="Lines layout">
+                    <span>Lines</span>
+                </div>
+                <div class="layout-option" data-layout="columns">
+                    <img src="images/layout_in_columns.png" alt="Columns layout">
+                    <span>Columns</span>
+                </div>
+                <div class="layout-option" data-layout="no_translation">
+                    <img src="images/layout_no_translation.png" alt="No translation layout">
+                    <span>No Translation</span>
+                </div>
+            </div>                
+            <button id="analyze-button" type="button">Analyze</button>
         </div>
         <div class="output-section">
-            <div id="output">Analysis results...</div>
+            <div id="basic-output">Analysis results will appear here...</div>
         </div>
     </div>
     <script src="script.js"></script>
