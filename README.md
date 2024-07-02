@@ -1,1 +1,1 @@
-# CuneiformTextAnalysis
+# Cuneiform Text Analysis
