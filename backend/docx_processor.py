@@ -131,7 +131,7 @@ def get_formatted_text_from_table(input_table, column_rec_ver:str, table_layout)
     
     else:
         print('Layout selection is not valid ...')
-        return None
+        return 'This is the problem'
     
     
 

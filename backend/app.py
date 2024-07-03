@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify, send_from_directory, make_response
+from flask import Flask, request, jsonify, send_from_directory, make_response, Response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
 import logging
 from docx_processor import extract_data_from_composition_document
 import traceback
+import json
+from io import BytesIO
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__, static_folder='../frontend')
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*", "expose_headers": "Content-Type"}})
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 ALLOWED_EXTENSIONS = {'docx'}
@@ -37,33 +39,41 @@ def upload_file():
         if 'file' not in request.files:
             logging.error('No file part in the request')
             return jsonify({'error': 'No file part'}), 400
-        
         file = request.files['file']
         if file.filename == '':
             logging.error('No selected file')
             return jsonify({'error': 'No selected file'}), 400
-        
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            logging.info(f'File saved: {file_path}')
             
+            file_buffer = BytesIO()
+            file.save(file_buffer)
+            file_buffer.seek(0)
+            logging.info(f'File uploaded to memory')
+        
             layout = request.form.get('layout', 'default')
+            # layout = 'lines'
             logging.info(f'Selected layout: {layout}')
             
-            content = extract_data_from_composition_document(file_path, layout)
-            response = make_response(jsonify({'success': True, 'content': content, 'layout': layout}))
-            response.headers['Location'] = request.url  # Prevent redirect
-            return response, 200
+            logging.debug('Starting content extraction')
+            content = extract_data_from_composition_document(file_buffer, layout)
+            # content = 'ulalal'
+            logging.debug(f"Content extracted, size: {len(str(content))} bytes")
+
+            response_data = {'success': True, 'content': content, 'layout': layout}
+            response_json = json.dumps(response_data, ensure_ascii=False)
+
+            logging.debug("Sending response")
         
-        logging.error('File type not allowed')
-        return jsonify({'error': 'File type not allowed'}), 400
+            return response_json, 200
     
     except Exception as e:
         logging.error(f'Error in upload_file: {str(e)}')
         logging.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
+    finally:
+        logging.debug("Upload function completed")
 
 @app.route('/analyze', methods=['POST'])
 def analyze_text():
