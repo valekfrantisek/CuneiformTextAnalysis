@@ -1,5 +1,10 @@
 from docx import Document
 
+version = '0.0.1'
+authors = ['František Válek']
+project_name = 'CuneiformTextAnalysis'
+project_web = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
+
 
 def load_document(input_path):
     """ This function loads the document for further analysis. """
@@ -134,8 +139,6 @@ def get_formatted_text_from_table(input_table, column_rec_ver:str, table_layout)
         return 'This is the problem'
     
     
-
-
 def get_headings_and_tables_from_document(input_document):
     """ This function gets headings and tables from DOCX document. """
     document_data = []

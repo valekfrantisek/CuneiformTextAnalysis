@@ -10,10 +10,15 @@
     <h1>Cuneiform Text Analyzer</h1>
     <div class="container">
         <div class="input-section">
-            <textarea id="input-text" placeholder="Enter or paste Akkadian text here..."></textarea>
-            <input type="file" id="file-upload" accept=".docx">
-            <button id="upload-button" type="button">Process</button>
-            <h2>Layout options</h2>
+            <h2>Input section</h2>
+            <h3>Upload file</h3>
+            <div class="upload-container">
+                <input type="file" id="file-upload" accept=".docx">
+                <button id="upload-button" type="button" class="custom-button" >Upload</button>                
+            </div>
+            <p id="upload-info"></p>
+            
+            <h3>Layout selection</h3>
                 <p>For correct functionality, select the layout you use in the tables for the text in cuneiform, and for the translation.</p>
             <div class="layout-options">
                 <div class="layout-option" data-layout="lines">
@@ -28,12 +33,30 @@
                     <img src="images/layout_no_translation.png" alt="No translation layout">
                     <span>No Translation</span>
                 </div>
-            </div>                
-            <button id="analyze-button" type="button">Analyze</button>
+            </div>           
+            
+            <h3>Analyse options</h3>
+            <div class="button-container" id="analyse-buttons">              
+                <button id="analyze-button-signs" type="button" class="custom-button">
+                    <span>analyse signs</span>
+                </button>
+                <button id="analyze-button-words" type="button" class="custom-button">
+                    <span>analyse words</span>
+                </button>
+                <button id="analyze-button-glossary" type="button" class="custom-button">
+                    <span>prepare glossary</span>
+                </button>
+                <button id="analyze-button-oracc" type="button" class="custom-button">
+                    <span>prepare for ORACC</span>
+                </button>
+            </div>
         </div>
+        
         <div class="output-section">
+            <h2>Analysis results</h2>
             <div id="basic-output">Analysis results will appear here...</div>
         </div>
+
     </div>
     <script src="script.js"></script>
 </body>

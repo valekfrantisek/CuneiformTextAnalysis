@@ -14,13 +14,15 @@ body {
     flex: 1;
 }
 
-textarea {
-    width: 100%;
-    height: 300px;
-}
-
 #file-upload {
     margin-top: 10px;
+}
+
+.upload-container {
+    display: flex;
+    justify-content: left;
+    gap: 20px;
+    margin-top: 20px;
 }
 
 #output {
@@ -29,6 +31,7 @@ textarea {
     min-height: 300px;
 }
 
+/* Layout styling */
 .layout-options {
     display: flex;
     justify-content: space-around;
@@ -62,4 +65,46 @@ textarea {
 
 .layout-option:hover {
     background-color: rgba(0, 123, 255, 0.466);
+}
+
+/* Buttons styling */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.custom-button {
+    background-color: #ffffff;
+    border: 2px solid #000000;
+    color: #000000;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+}
+
+.custom-button:hover {
+    background-color: rgba(0, 123, 255, 0.466);
+}
+
+.custom-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button:disabled {
+    background-color: rgba(255, 0, 34, 0.055);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button span {
+    font-size: 14px;
 }
