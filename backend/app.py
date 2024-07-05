@@ -81,11 +81,18 @@ def analyse_signs(upload_id):
         return jsonify({'error': 'File not found'}), 404
     
     signs_used_in_manuscript, manuscript_syntax_error_report = analyse_signs_used(processed_file)
+    if manuscript_syntax_error_report == []:
+        manuscript_syntax_error_report = 'None syntax errors encountered in this manuscript during the sign analysis'
+    
+    print(signs_used_in_manuscript)
+    print(manuscript_syntax_error_report)
+    
+    signs_used_in_manuscript = dict(sorted(signs_used_in_manuscript.items()))
 
     response_data = {'success': True, 'analysis': signs_used_in_manuscript, 'syntax_errors': manuscript_syntax_error_report}
     response_json = json.dumps(response_data, ensure_ascii=False)
     
-    # TODO: CONTINUE HERE!!
+    # TODO: CONTINUE HERE!! Add to JS!!
     
     return response_json, 200
 

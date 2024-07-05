@@ -103,7 +103,7 @@ def get_signs_from_line(line_text:str, line_id):
                 enclose_char = '<'
         elif char == '>':
             enclose_char = ''
-        elif char.isalnum() or char == '!' or char == '?':
+        elif char.isalnum() or char == '!' or char == '?' or char == '+' or char =='/':
             current_sign += char
         else:
             syntax_error_report.append({'char': char, 'line_id': line_id})
@@ -122,7 +122,7 @@ def get_signs_from_line(line_text:str, line_id):
     return signs_in_line, syntax_error_report
 
 
-def analyse_signs_used(input_data, use_reconstructions=False, use_partial_reconstructions=True, use_uncertainties=False, use_additions=False, use_erasures=True):
+def analyse_signs_used(input_data:dict):
     """ This function provides analysis of signs used in the provided data.
     
     Args:
@@ -138,7 +138,9 @@ def analyse_signs_used(input_data, use_reconstructions=False, use_partial_recons
         
     """
     
-    signs_used_in_manuscript = defaultdict(int)
+    signs_used_in_manuscript = {}
+    sign_dict_template = {'preserved': 0, 'partial': 0, 'reconstructed': 0, 'in <>': 0, 'in ()': 0, 'in <<>>': 0}
+    
     manuscript_syntax_error_report = []
     
     for section in input_data:
@@ -153,7 +155,13 @@ def analyse_signs_used(input_data, use_reconstructions=False, use_partial_recons
                 manuscript_syntax_error_report.extend(line_syntax_error_report)
                 
                 for sign in line_signs_analysis:
-                    signs_used_in_manuscript[sign] += line_signs_analysis[sign]
+                    if sign in signs_used_in_manuscript:
+                        for state in signs_used_in_manuscript[sign]:
+                            signs_used_in_manuscript[sign][state] += line_signs_analysis[sign][state]
+                    else:
+                        signs_used_in_manuscript[sign] = sign_dict_template.copy()
+                        for state in signs_used_in_manuscript[sign]:
+                            signs_used_in_manuscript[sign][state] += line_signs_analysis[sign][state]
                 
     return signs_used_in_manuscript, manuscript_syntax_error_report
 
