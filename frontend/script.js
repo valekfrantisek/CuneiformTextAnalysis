@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadButtonATF = document.getElementById('download-button-atf');
     let currentUploadId = null;
     let layout = 'lines'
+    let currentAnalysis = null
 
     analyzeButtonSigns.disabled = true;
     analyzeButtonWords.disabled = true;
@@ -114,6 +115,22 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         analyzeORACC();
     });
+
+    downloadButtonATF.addEventListener('click', (event) => {
+        event.preventDefault();
+        downloadFile('atf');
+    });
+
+    downloadButtonCSV.addEventListener('click', (event) => {
+        event.preventDefault();
+        downloadFile('csv');
+    });
+
+    downloadButtonEXCEL.addEventListener('click', (event) => {
+        event.preventDefault();
+        downloadFile('xlsx');
+    });
+
 
     function getSelectedLayout() {
         const selectedOption = document.querySelector('.layout-option.selected');
@@ -235,6 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
             errors.textContent = `${JSON.stringify(jsonResult.syntax_errors)}`;
 
             downloadButtonATF.disabled = true
+            downloadButtonCSV.disabled = false
+            downloadButtonEXCEL.disabled = false
+
+            currentAnalysis = 'signs'
 
         } catch (error) {
             console.error('Error:', error);
@@ -281,6 +302,10 @@ document.addEventListener('DOMContentLoaded', () => {
             errors.style.display = 'none'
 
             downloadButtonATF.disabled = true
+            downloadButtonCSV.disabled = false
+            downloadButtonEXCEL.disabled = false
+
+            currentAnalysis = 'words'
 
         } catch (error) {
             console.error('Error:', error);
@@ -325,6 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
             errors.style.display = 'none'
 
             downloadButtonATF.disabled = true
+            downloadButtonCSV.disabled = false
+            downloadButtonEXCEL.disabled = false
+
+            currentAnalysis = 'glossary'
 
         } catch (error) {
             console.error('Error:', error);
@@ -352,15 +381,20 @@ document.addEventListener('DOMContentLoaded', () => {
             errors.textContent = oracc_results.syntax_errors
 
             downloadButtonATF.disabled = false
+            downloadButtonCSV.disabled = true
+            downloadButtonEXCEL.disabled = true
+
+            currentAnalysis = 'oracc'
 
         } catch (error) {
             console.error('Error:', error);
             output.textContent = `Error: ${error.message}`;
         }
-    } 
+    }
 
-    // Prevent navigation
-    // window.onbeforeunload = function() {
-    //     return "Are you sure you want to leave? Your analysis may be interrupted.";
-    // };
+    function downloadFile(format) {
+        let endpoint = `${SERVER_URL}/download_${format}/${currentAnalysis}_${currentUploadId}`;
+        window.location.href = endpoint;
+    }
+
 });
