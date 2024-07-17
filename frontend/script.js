@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('basic-output');
     const errors = document.getElementById('error-output')
     const layoutOptions = document.querySelectorAll('.layout-option');
+    const oraccOptions = document.querySelectorAll('.oracc-option');
     const SERVER_URL = 'http://127.0.0.1:5000';
     const analyzeButtonSigns = document.getElementById('analyze-button-signs');
     const analyzeButtonWords = document.getElementById('analyze-button-words');
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const analyzeButtonORACC = document.getElementById('analyze-button-oracc');
     const downloadButtonCSV = document.getElementById('download-button-csv');
     const downloadButtonEXCEL = document.getElementById('download-button-excel');
+    const downloadButtonATF = document.getElementById('download-button-atf');
     let currentUploadId = null;
     let layout = 'lines'
 
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     analyzeButtonORACC.disabled = true;
     downloadButtonCSV.disabled = true
     downloadButtonEXCEL.disabled = true
+    downloadButtonATF.disabled = true
 
     dropZone.addEventListener('click', () => fileInput.click());
 
@@ -85,6 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // oraccOptions.forEach(option => {
+    //     option.addEventListener('click', () => {
+    //         oraccOptions.forEach(opt => opt.classList.remove('selected'));
+    //         option.classList.add('selected');
+    //     });
+    // });
+
     analyzeButtonSigns.addEventListener('click', (event) => {
         event.preventDefault();
         analyzeSigns();
@@ -109,6 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedOption = document.querySelector('.layout-option.selected');
         return selectedOption ? selectedOption.dataset.layout : 'lines';
     }
+
+    // function getSelectedOraccOption() {
+    //     const selectedOption = document.querySelector('.oracc-option.selected');
+    //     return selectedOption ? selectedOption.dataset.layout : '';
+    // }
 
     async function uploadFile(file) {    
         layout = getSelectedLayout()
@@ -147,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const jsonResult = JSON.parse(text);
                         console.log('JSON parsed successfully.');
                         errors.style.display = 'none'
-                        output.textContent = JSON.stringify(jsonResult, null, 2);
+                        output.textContent = `File uploaded: ${file.name}`;
                         currentUploadId = jsonResult.upload_id;
                         analyzeButtonSigns.disabled = false;
                         analyzeButtonWords.disabled = false;
@@ -219,6 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
             errors.style.display = 'block'
             errors.textContent = `${JSON.stringify(jsonResult.syntax_errors)}`;
 
+            downloadButtonATF.disabled = true
+
         } catch (error) {
             console.error('Error:', error);
             output.textContent = `Error_catch: ${error.message}`;
@@ -263,6 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             errors.style.display = 'none'
 
+            downloadButtonATF.disabled = true
+
         } catch (error) {
             console.error('Error:', error);
             output.textContent = `Error: ${error.message}`;
@@ -305,6 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             errors.style.display = 'none'
 
+            downloadButtonATF.disabled = true
+
         } catch (error) {
             console.error('Error:', error);
             output.textContent = `Error_catch: ${error.message}`;
@@ -329,6 +350,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             errors.style.display = 'block'
             errors.textContent = oracc_results.syntax_errors
+
+            downloadButtonATF.disabled = false
 
         } catch (error) {
             console.error('Error:', error);
