@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('Parsing JSON...');
                         const jsonResult = JSON.parse(text);
                         console.log('JSON parsed successfully.');
+                        errors.style.display = 'none'
                         output.textContent = JSON.stringify(jsonResult, null, 2);
                         currentUploadId = jsonResult.upload_id;
                         analyzeButtonSigns.disabled = false;
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderTable(data) {
+    function renderTableSings(data) {
         let tableHTML = '<table><tr><th>Sign</th><th>Preserved</th><th>Partial</th><th>Reconstructed</th><th>In &lt;&gt;</th><th>In ()</th><th>In &lt;&lt;&gt;&gt;</th></tr>';
         
         for (let sign in data) {
@@ -212,9 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const jsonResult = JSON.parse(signs_results);
             console.log('JSON parsed successfully.');
 
-            const tableHTML = renderTable(jsonResult.analysis);
+            const tableHTML = renderTableSings(jsonResult.analysis);
             document.getElementById('basic-output').innerHTML = tableHTML;
 
+            errors.style.display = 'block'
             errors.textContent = `${JSON.stringify(jsonResult.syntax_errors)}`;
 
         } catch (error) {
@@ -223,55 +225,95 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function renderTableWords(data) {
+        let tableHTML = '<table><tr><th>attested form</th><th>preserved</th><th>partially preserved</th><th>reconstructed</th></tr>';
+        
+        for (let WordForm in data) {
+            tableHTML += `<tr>
+                <td>${WordForm}</td>
+                <td>${data[WordForm]['preserved']}</td>
+                <td>${data[WordForm]['partially preserved']}</td>
+                <td>${data[WordForm]['reconstructed']}</td>
+            </tr>`;
+        }
+        
+        tableHTML += '</table>';
+        return tableHTML;
+    }
+
     async function analyzeWords() {
         console.log('Analyzing words');
         try {
-            const response = await fetch(`${SERVER_URL}/analyzeWordsAction`, {
+            const response = await fetch(`${SERVER_URL}/analyzeWordsAction/${currentUploadId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ data: 'Some data' }) // Můžete upravit odesílaná data podle potřeby
-            });
+                });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
-            output.textContent = `Result: ${JSON.stringify(result)}`;
+            const glossary_results = await response.text();
+            console.log('Full response received. Size:', glossary_results.length);
+            console.log('Parsing JSON...');
+            const jsonResult = JSON.parse(glossary_results);
+            console.log('JSON parsed successfully.');
+
+            const tableHTML = renderTableWords(jsonResult.analysis);
+            document.getElementById('basic-output').innerHTML = tableHTML;
+
+            errors.style.display = 'none'
+
         } catch (error) {
             console.error('Error:', error);
             output.textContent = `Error: ${error.message}`;
         }
-    } 
+    }
+
+    function renderTableGlossary(data) {
+        let tableHTML = '<table><tr><th>Attested form</th><th>attestation</th></tr>';
+        
+        for (let AttestedForm in data) {
+            tableHTML += `<tr>
+                <td>${AttestedForm}</td>
+                <td>${data[AttestedForm]['attestation']}</td>
+            </tr>`;
+        }
+        
+        tableHTML += '</table>';
+        return tableHTML;
+    }
 
     async function analyzeGlossary() {
         console.log('Analyzing glossary');
         try {
-            const response = await fetch(`${SERVER_URL}/analyzeGlossaryAction`, {
+            const response = await fetch(`${SERVER_URL}/analyzeGlossaryAction/${currentUploadId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ data: 'Some data' }) // Můžete upravit odesílaná data podle potřeby
-            });
+                });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
-            output.textContent = `Result: ${JSON.stringify(result)}`;
+            const glossary_results = await response.text();
+            console.log('Full response received. Size:', glossary_results.length);
+            console.log('Parsing JSON...');
+            const jsonResult = JSON.parse(glossary_results);
+            console.log('JSON parsed successfully.');
+
+            const tableHTML = renderTableGlossary(jsonResult.analysis);
+            document.getElementById('basic-output').innerHTML = tableHTML;
+
+            errors.style.display = 'none'
+
         } catch (error) {
             console.error('Error:', error);
-            output.textContent = `Error: ${error.message}`;
+            output.textContent = `Error_catch: ${error.message}`;
         }
     } 
 
     async function analyzeORACC() {
         try {
-            const response = await fetch(`${SERVER_URL}/analyzeORACCAction`, {
+            const response = await fetch(`${SERVER_URL}/analyzeORACCAction/${currentUploadId}`, {
                 method: 'POST',
             });
 
@@ -279,8 +321,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
-            output.textContent = `Result: ${JSON.stringify(result)}`;
+            const oracc_results = await response.json()
+            // const jsonResult = JSON.parse(oracc_results);
+            console.log('JSON parsed successfully.');
+
+            document.getElementById('basic-output').innerHTML = oracc_results.as_html_data
+
+            errors.style.display = 'block'
+            errors.textContent = oracc_results.syntax_errors
+
         } catch (error) {
             console.error('Error:', error);
             output.textContent = `Error: ${error.message}`;

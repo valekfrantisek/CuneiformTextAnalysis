@@ -31,6 +31,14 @@ body {
     min-height: 300px;
 }
 
+.error-output{
+    display: none;
+}
+
+.oracc-output{
+    font-family: 'Source Code Pro', 'Fira Mono', 'Roboto Mono', monospace;
+}
+
 /* Upload section */
 .drop-zone {
     width: 100%;

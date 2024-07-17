@@ -18,7 +18,7 @@ from io import BytesIO
 import uuid
 
 from docx_processor import extract_data_from_composition_document
-from cuneiform_analyser import analyse_signs_used
+from cuneiform_analyser import analyse_signs_used, extract_attested_forms_from_manuscript, analyse_words_used, get_table_of_words, oraccise_document
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -101,6 +101,50 @@ def analyse_signs(upload_id):
     response_json = json.dumps(response_data, ensure_ascii=False)
     
     # TODO: CONTINUE HERE!! Add to JS!!
+    
+    return response_json, 200
+
+
+@app.route('/analyzeWordsAction/<upload_id>', methods=['POST'])
+def analyze_words(upload_id):
+    processed_file = json.loads(cache.get(f'upload_{upload_id}'))
+    if not processed_file:
+        return jsonify({'error': 'File not found'}), 404
+    
+    reconstructed_words_used_in_dataset, partially_reconstructed_words_used_in_dataset, preserved_words_used_in_dataset, full_words_used_in_dataset = analyse_words_used(input_data=processed_file)
+    
+    word_forms_table_data = get_table_of_words(reconstructed_words_used_in_dataset, partially_reconstructed_words_used_in_dataset, preserved_words_used_in_dataset, full_words_used_in_dataset)
+    
+    response_data = {'success': True, 'analysis': word_forms_table_data, 'syntax_errors': 'None'}
+    response_json = json.dumps(response_data, ensure_ascii=False)
+    
+    return response_json, 200
+
+
+@app.route('/analyzeGlossaryAction/<upload_id>', methods=['POST'])
+def analyze_glossary(upload_id):
+    processed_file = json.loads(cache.get(f'upload_{upload_id}'))
+    if not processed_file:
+        return jsonify({'error': 'File not found'}), 404
+    
+    glossary_dict = extract_attested_forms_from_manuscript(input_data=processed_file)
+    response_data = {'success': True, 'analysis': glossary_dict, 'syntax_errors': 'None'}
+    response_json = json.dumps(response_data, ensure_ascii=False)
+    
+    return response_json, 200
+
+
+@app.route('/analyzeORACCAction/<upload_id>', methods=['POST'])
+def analyze_ORACC(upload_id):
+    processed_file = json.loads(cache.get(f'upload_{upload_id}'))
+    if not processed_file:
+        return jsonify({'error': 'File not found'}), 404
+    
+    orrac_output_data, error_report = oraccise_document(processed_file)
+    oracc_data_as_html = orrac_output_data.replace('\n', '<br>')
+    oracc_data_as_html = f'<p class="oracc-output">{oracc_data_as_html}</p>'
+    response_data = {'success': True, 'analysis': orrac_output_data, 'as_html_data': oracc_data_as_html, 'syntax_errors': error_report}
+    response_json = json.dumps(response_data, ensure_ascii=False)
     
     return response_json, 200
 
