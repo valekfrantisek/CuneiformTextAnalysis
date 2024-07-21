@@ -243,7 +243,6 @@ def extract_data_from_composition_document(input_path, layout):
         full_formated_data_of_one_table = get_formatted_text_from_table(input_table=table, section=heading, layout=layout)
         
         complete_analysed_document[heading] = full_formated_data_of_one_table
-        print(complete_analysed_document)
         
         # NOTE: printing individual lines in simple format
         for line in full_formated_data_of_one_table['cuneiform_data']:

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const SERVER_URL = 'http://127.0.0.1:5000';
+    
     const dropZone = document.getElementById('drop-zone');
     
     const fileInput = document.getElementById('file-upload');
@@ -20,8 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadButtonCSV = document.getElementById('download-button-csv');
     const downloadButtonXLSX = document.getElementById('download-button-xlsx');
     const downloadButtonATF = document.getElementById('download-button-atf');
-    
-    const SERVER_URL = 'http://127.0.0.1:5000';
 
     let currentUploadId = null;
     let layout = 'lines'

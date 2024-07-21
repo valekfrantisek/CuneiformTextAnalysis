@@ -1,23 +1,21 @@
 """ This is a Flask app for the CuneiformTextAnalysis project. It facilitates functions for the cuneiform transliterated text analysis. """
 
-version = '0.0.1'
+version = 'BETA 0.0.1'
 authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_git = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
 project_web = 'https://dh-tools.cz/CuneiformTextAnalysis'
 
-from flask import Flask, request, jsonify, send_from_directory, send_file, Response
+from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from cachelib import SimpleCache
-import os
 import logging
 import traceback
 import json
 from io import BytesIO, StringIO
 import uuid
 import pandas as pd
-import time
 
 from docx_processor import extract_data_from_composition_document
 from cuneiform_analyser import analyse_signs_used, extract_attested_forms_from_manuscript, analyse_words_used, get_table_of_words, oraccise_document
