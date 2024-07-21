@@ -852,6 +852,9 @@ def roman_to_arabic(roman):
 
 def parse_section(section_id:str, rec_vers=True, cols=True):
     """ This function parses the section id (taken from the heading in DOCX document) so it can be used in the ORACC manuscript designation. """
+    rec_ver = None
+    col_num = None
+    
     if rec_vers and cols:
         try:
             section_id_elems = section_id.split(' ')
@@ -955,7 +958,7 @@ def oraccise_document(input_document_data: dict, rec_vers=True, cols=True, lines
                 
                 oracc_doc += f'\n@{trsl_line_des} {line_data}\n'
     
-    print(oracc_doc)
+    # print(oracc_doc)
     
     return oracc_doc, error_report
     

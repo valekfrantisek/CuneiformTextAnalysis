@@ -17,6 +17,7 @@ import json
 from io import BytesIO, StringIO
 import uuid
 import pandas as pd
+import time
 
 from docx_processor import extract_data_from_composition_document
 from cuneiform_analyser import analyse_signs_used, extract_attested_forms_from_manuscript, analyse_words_used, get_table_of_words, oraccise_document
@@ -142,23 +143,46 @@ def analyze_glossary(upload_id):
     return response_json, 200
 
 
+def change_False_True_str_to_bool(input_values: list):
+    output = []
+    for string in input_values:
+        if string.lower() == 'true':
+            value = True
+        elif string.lower() == 'false':
+            value = False
+        else:
+            value = 'Not valid'
+        
+        output.append(value)
+
+    return output
+        
+
 @app.route('/analyzeORACCAction/<upload_id>', methods=['POST'])
 def analyze_ORACC(upload_id):
     processed_file = json.loads(cache.get(f'upload_{upload_id}'))
     if not processed_file:
         return jsonify({'error': 'File not found'}), 404
     
-    oracc_output_data, error_report = oraccise_document(processed_file)
+    data = request.json
+    
+    parameters = change_False_True_str_to_bool([data.get('obverseReverse'), data.get('columns')])
+    rec_vers = parameters[0]
+    cols = parameters[1]
+    
+    oracc_output_data, error_report = oraccise_document(processed_file, rec_vers=rec_vers, cols=cols)
     
     cache.set(f'oracc_{upload_id}', json.dumps(oracc_output_data), timeout=3600)    
     
     oracc_data_as_html = oracc_output_data.replace('\n', '<br>')
     oracc_data_as_html = f'<p class="oracc-output">{oracc_data_as_html}</p>'
+    
     response_data = {'success': True, 'analysis': oracc_output_data, 'as_html_data': oracc_data_as_html, 'syntax_errors': error_report}
     response_json = json.dumps(response_data, ensure_ascii=False)
     
     return response_json, 200
 
+""" DOWNLOAD FUNCTIONS --------------------------------------------------------------- """
 
 @app.route('/download_csv/<filename>', methods=['GET'])
 def download_csv(filename):

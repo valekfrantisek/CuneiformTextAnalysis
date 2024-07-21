@@ -1,29 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('drop-zone');
+    
     const fileInput = document.getElementById('file-upload');
     const fileNameDisplay = document.getElementById('file-name');
+    
     const output = document.getElementById('basic-output');
     const errors = document.getElementById('error-output')
+    
     const layoutOptions = document.querySelectorAll('.layout-option');
-    const oraccOptions = document.querySelectorAll('.oracc-option');
-    const SERVER_URL = 'http://127.0.0.1:5000';
+
+    const obverseReverseCheckbox = document.getElementById('ORACCObverseReverse');
+    const columnsCheckbox = document.getElementById('ORACCColumns');
+
     const analyzeButtonSigns = document.getElementById('analyze-button-signs');
     const analyzeButtonWords = document.getElementById('analyze-button-words');
     const analyzeButtonGlossary = document.getElementById('analyze-button-glossary');
     const analyzeButtonORACC = document.getElementById('analyze-button-oracc');
+    
     const downloadButtonCSV = document.getElementById('download-button-csv');
-    const downloadButtonEXCEL = document.getElementById('download-button-excel');
+    const downloadButtonXLSX = document.getElementById('download-button-xlsx');
     const downloadButtonATF = document.getElementById('download-button-atf');
+    
+    const SERVER_URL = 'http://127.0.0.1:5000';
+
     let currentUploadId = null;
     let layout = 'lines'
     let currentAnalysis = null
+    let obverseReverseState = "False"
+    let columnsState = "False"
 
     analyzeButtonSigns.disabled = true;
     analyzeButtonWords.disabled = true;
     analyzeButtonGlossary.disabled = true;
     analyzeButtonORACC.disabled = true;
     downloadButtonCSV.disabled = true
-    downloadButtonEXCEL.disabled = true
+    downloadButtonXLSX.disabled = true
     downloadButtonATF.disabled = true
 
     dropZone.addEventListener('click', () => fileInput.click());
@@ -89,13 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // oraccOptions.forEach(option => {
-    //     option.addEventListener('click', () => {
-    //         oraccOptions.forEach(opt => opt.classList.remove('selected'));
-    //         option.classList.add('selected');
-    //     });
-    // });
-
     analyzeButtonSigns.addEventListener('click', (event) => {
         event.preventDefault();
         analyzeSigns();
@@ -126,21 +130,30 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadFile('csv');
     });
 
-    downloadButtonEXCEL.addEventListener('click', (event) => {
+    downloadButtonXLSX.addEventListener('click', (event) => {
         event.preventDefault();
         downloadFile('xlsx');
     });
-
 
     function getSelectedLayout() {
         const selectedOption = document.querySelector('.layout-option.selected');
         return selectedOption ? selectedOption.dataset.layout : 'lines';
     }
 
-    // function getSelectedOraccOption() {
-    //     const selectedOption = document.querySelector('.oracc-option.selected');
-    //     return selectedOption ? selectedOption.dataset.layout : '';
-    // }
+    if (!columnsCheckbox || !obverseReverseCheckbox) {
+        console.error("One or more required elements are missing.");
+        return;
+    }
+    
+    function updateStates() {
+        columnsState = columnsCheckbox.checked ? "True" : "False";
+        obverseReverseState = obverseReverseCheckbox.checked ? "True" : "False";
+        
+        console.log("States updated:", { columnsState, obverseReverseState });
+    }
+
+    columnsCheckbox.addEventListener('change', updateStates);
+    obverseReverseCheckbox.addEventListener('change', updateStates);
 
     async function uploadFile(file) {    
         layout = getSelectedLayout()
@@ -253,13 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             downloadButtonATF.disabled = true
             downloadButtonCSV.disabled = false
-            downloadButtonEXCEL.disabled = false
+            downloadButtonXLSX.disabled = false
 
             currentAnalysis = 'signs'
 
         } catch (error) {
             console.error('Error:', error);
-            output.textContent = `Error_catch: ${error.message}`;
+            output.textContent = `Error: ${error.message}`;
         }
     }
 
@@ -303,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             downloadButtonATF.disabled = true
             downloadButtonCSV.disabled = false
-            downloadButtonEXCEL.disabled = false
+            downloadButtonXLSX.disabled = false
 
             currentAnalysis = 'words'
 
@@ -351,20 +364,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
             downloadButtonATF.disabled = true
             downloadButtonCSV.disabled = false
-            downloadButtonEXCEL.disabled = false
+            downloadButtonXLSX.disabled = false
 
             currentAnalysis = 'glossary'
 
         } catch (error) {
             console.error('Error:', error);
-            output.textContent = `Error_catch: ${error.message}`;
+            output.textContent = `Error: ${error.message}`;
         }
-    } 
-
+    }
+    
     async function analyzeORACC() {
+        // if (columnsCheckbox.checked == true){
+        //     columnsState = "True"
+        // } else {
+        //     columnsState = "False"
+        // }
+
+        // if (obverseReverseCheckbox.checked == true){
+        //     obverseReverseState = "True"
+        // } else {
+        //     obverseReverseState = "False"
+        // }
+
+        console.log(obverseReverseState)
+        console.log(columnsState)
+
         try {
             const response = await fetch(`${SERVER_URL}/analyzeORACCAction/${currentUploadId}`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    obverseReverse: obverseReverseState,
+                    columns: columnsState
+                })
             });
 
             if (!response.ok) {
@@ -382,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             downloadButtonATF.disabled = false
             downloadButtonCSV.disabled = true
-            downloadButtonEXCEL.disabled = true
+            downloadButtonXLSX.disabled = true
 
             currentAnalysis = 'oracc'
 

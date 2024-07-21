@@ -5,17 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Akkadian Text Analyzer</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Cuneiform Text Analyzer</h1>
+    <div class="container-header">
+        <h1>Cuneiform Text Analyzer - BETA 0.0.1</h1>
+        <p>This portal was created to ease working with cuneiform transliterations. So far, it is aimed at analyzing documents created in Microsoft Word.</p>
+    </div>
     <div class="container">
         <div class="input-section">
             <h2>Input section</h2>
-            <h3>Instructions</h3>
-            <p>TODO: add instructions... </p>
+            <h3>Basic Instructions</h3>
+            <p>This section serves to analyze input provided in <i>.docx</i> format. For proper functionality, ensure the following:</p>
+            <ul>
+                <li>Upload data in a <i>.docx</i> file that:</li>
+                    <ul>
+                        <li>uses only headings and tables; and</li>
+                        <li>headings indicate obverse/revers/columns..., and</li>
+                        <li>cuneiform text is in tables with a consistent layout.</li>
+                    </ul>
+                <li>Use:</li>
+                    <ul>
+                        <li><i>cursive</i> for syllabic reading,</li>
+                        <li>CAPS or <font style="font-variant: small-caps">small caps</font> for logo/ideograms and signs</li>
+                        <li><sup>superscript</sup> for (post)determinatives,</li>
+                        <li><sub>subscript</sub> for sign numbers,</li>
+                        <li>half brackets to indicate semi-damaged signs ([<i>šum</i>]⸢-<i>ma</i>⸣instead of [<i>šum-m</i>]<i>a</i>).</li>
+                    </ul>
+                <li>Examples of valid data (RS 25.435, following AuOrS 23, no. 36):</li>
+                    <ul>
+                        <li><a href='examples/line_formatting.docx'>by-line formatting</a></li>
+                        <li><a href='examples/cols_formatting.docx'>columns formatting</a></li>
+                        <li><a href='examples/no_trsl_formatting.docx'>formatting without translation</a></li>
+                    </ul>
+            </ul>
 
             <h3>Layout selection</h3>
-            <p>For correct functionality, select the layout you use in the tables for the text in cuneiform, and for the translation.</p>
+            <p>For correct functionality, select the layout used in the tables.</p>
             <div class="layout-options">
                 <div class="layout-option" data-layout="lines">
                     <img src="images/layout_by_lines.png" alt="Lines layout">
@@ -46,19 +72,32 @@
                     <span>analyse signs</span>
                 </button>
                 <button id="analyze-button-words" type="button" class="custom-button">
-                    <span>analyse words</span>
+                    <span>analyse word forms</span>
                 </button>
                 <button id="analyze-button-glossary" type="button" class="custom-button">
                     <span>prepare glossary</span>
                 </button>
             </div>
-            <div class="button-container" id="analyse-buttons">
-                <h4>Oracc layout options</h4>
-                <div class="oracc-option" oracc-layout="obv_rev">
-                    <span>Obverse/Revers</span>
-                </div>
-                <div class="oracc-option" oracc-layout="columns">
-                    <span>Columns</span>
+
+            <h3>Prepare for ORACC</h3>
+            <p>You can use headers in your documents to correctly prepare document for ORACC. In the layout options below, select what information you give in the headings. Indicate obv./rev. first, then column number (use "col./column" before the number)</p>
+            <p>heading examples: "rev. col. I"; "col. 2", "Vs."</p>
+            <p>for obverse, you can use "obverse", "obv.", "recto", or "Vs."</p>
+            <p>for reverse, you can use "reverse", "rev.", "verso", or "Rs."</p>
+            <p>use roman or arabic numerals for column numbers.</p>
+            <div class="oracc-container" id="analyse-buttons">
+                <div class="oracc-layout-options">
+                    <h4>Oracc layout options</h4>
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="ORACCObverseReverse">
+                        <span class="checkmark"></span>
+                        <span class="label-text">obverse/reverse</span>
+                    </label>
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="ORACCColumns">
+                        <span class="checkmark"></span>
+                        <span class="label-text">columns</span>
+                    </label>
                 </div>
                 <button id="analyze-button-oracc" type="button" class="custom-button">
                     <span>prepare for ORACC</span>
@@ -75,8 +114,8 @@
                 <button id="download-button-csv" type="button" class="custom-button">
                     <span>Download CSV</span>
                 </button>
-                <button id="download-button-excel" type="button" class="custom-button">
-                    <span>Download EXCEL</span>
+                <button id="download-button-xlsx" type="button" class="custom-button">
+                    <span>Download XLSX</span>
                 </button>
                 <button id="download-button-atf" type="button" class="custom-button">
                     <span>Download ATF</span>
@@ -85,7 +124,29 @@
             <h3>Analysis results</h3>
             <div id="basic-output">Analysis results will appear here...</div>
         </div>
+    </div>
 
+    <div class="work-in-progress">
+        <h2>Work in progress</h2>
+        <p>Additional tools and functionalities are being prepared. If you have any suggestions, write to frantisek.valek@upce.cz</p>
+        <h3>Different use of break indications</h3>
+            <p>e.g., [<i>šum-m</i>]<i>a</i> = [<i>šum</i>]⸢-<i>ma</i>⸣</p>
+        <h3>Analyse CSV input</h3>
+        <h3>Analyse XLSX input</h3>
+        <h3>Analyse Word non-tabular input</h3>
+        <h3>ORACC intertextual analysis</h3>
+    </div>
+
+    <div class="container-footer">
+        <div class="footer-content">
+            <span class="footer-left">license: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA</a></span>
+            <span class="footer-center">contact: <a href="mailto:frantisek.valek@upce.cz">frantisek.valek@upce.cz</a></span>
+            <span class="footer-right">
+                <a href="https://github.com/valekfrantisek/CuneiformTextAnalysis">
+                    <img src="images/GitHub_logo.png" alt="Project on github" height="60px">
+                </a>
+            </span>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

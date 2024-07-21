@@ -1,6 +1,6 @@
 from docx import Document
 
-version = '0.0.1'
+version = 'BETA 0.0.1'
 authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_web = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
@@ -12,8 +12,8 @@ def load_document(input_path):
     return manuscript_document
 
 
-def sum_line_designation(rec_ver: str, column:str, line_num:str):
-    return f'{rec_ver} {column} {line_num}'
+def sum_line_designation(section:str, line_num:str):
+    return f'{section} {line_num}'
 
 
 def assign_type(formatted_data:dict):
@@ -68,9 +68,9 @@ def simple_print_line_data(formatted_line_data:list):
     return line_text
 
 
-def get_formatted_text_from_table(input_table, rec_ver:str, column:str, layout='lines'):
+def get_formatted_text_from_table(input_table, section:str, layout='lines'):
     full_formated_data_of_one_table = {'cuneiform_data': {}, 'translation_data': {}}
-    full_line_designation = sum_line_designation(rec_ver=rec_ver, column=column, line_num='0')
+    full_line_designation = sum_line_designation(section=section, line_num='0')
     next_cell_translation = False
     next_cell_note = False
     next_cell_cuneiform = False
@@ -96,7 +96,7 @@ def get_formatted_text_from_table(input_table, rec_ver:str, column:str, layout='
                         next_cell_note = False
                         next_cell_translation = False
                         line_num = cell.text
-                        full_line_designation = sum_line_designation(rec_ver=rec_ver, column=column, line_num=line_num)
+                        full_line_designation = sum_line_designation(section=section, line_num=line_num)
                     
                 elif i == 1:
                     if next_cell_translation:
@@ -111,7 +111,7 @@ def get_formatted_text_from_table(input_table, rec_ver:str, column:str, layout='
                             line_primary_analysis.append(element_info)
                             
                         full_formated_data_of_one_table['cuneiform_data'][full_line_designation] = line_primary_analysis
-                        next_cell_translation = False
+                        next_cell_cuneiform = False
                         
                     elif next_cell_note:
                         full_formated_data_of_one_table['cuneiform_data'][f'note {full_line_designation}-{note_id}'] = cell.text
@@ -121,93 +121,84 @@ def get_formatted_text_from_table(input_table, rec_ver:str, column:str, layout='
                                 
         return full_formated_data_of_one_table
     
-    # elif layout == 'columns':
-    #     # TODO FINISH THIS!! 
-    #     for row in input_table.rows:
-    #         for i, cell in enumerate(row.cells):
-    #             if i == 0:
-    #                 if cell.text == '':
-    #                     """ If the first cell is empty it is line for translation. """
-    #                     next_cell_translation = True
-    #                     next_cell_note = False
-    #                     next_cell_cuneiform = False
+    elif layout == 'columns':
+        for row in input_table.rows:
+            for i, cell in enumerate(row.cells):
+                if i == 0:
+                    if cell.text == '':
+                        """ If the first cell is empty it is an error. """
+                        next_cell_note = False
+                        next_cell_cuneiform = False
+                        print('Error, lines must be designated!')
                         
-    #                 elif cell.text.lower() == 'note':
-    #                     """ If the first cell is 'note' it is line for note. """
-    #                     next_cell_note = True
-    #                     next_cell_translation = False
-    #                     next_cell_cuneiform = False
-    #                 else:
-    #                     next_cell_cuneiform = True
-    #                     next_cell_note = False
-    #                     next_cell_translation = False
-    #                     line_num = cell.text
-    #                     full_line_designation = sum_line_designation(rec_ver=rec_ver, column=column, line_num=line_num)
+                    elif cell.text.lower() == 'note':
+                        """ If the first cell is 'note' it is line for note. """
+                        next_cell_note = True
+                        next_cell_cuneiform = False
+                    else:
+                        next_cell_cuneiform = True
+                        next_cell_note = False
+                        line_num = cell.text
+                        full_line_designation = sum_line_designation(section=section, line_num=line_num)
                     
-    #             elif i == 1:
-    #                 if next_cell_translation:
-    #                     full_formated_data_of_one_table['translation_data'][full_line_designation] = cell.text
-    #                     next_cell_translation = False
-
-    #                 elif next_cell_cuneiform:
-    #                     cell_data = get_formatted_text_from_cell(input_cell_data=cell)
-    #                     line_primary_analysis = []
-    #                     for element in cell_data:
-    #                         element_info = assign_type(element)
-    #                         line_primary_analysis.append(element_info)
+                elif i == 1:
+                    if next_cell_cuneiform:
+                        cell_data = get_formatted_text_from_cell(input_cell_data=cell)
+                        line_primary_analysis = []
+                        for element in cell_data:
+                            element_info = assign_type(element)
+                            line_primary_analysis.append(element_info)
                             
-    #                     full_formated_data_of_one_table['cuneiform_data'][full_line_designation] = line_primary_analysis
-    #                     next_cell_translation = False
+                        full_formated_data_of_one_table['cuneiform_data'][full_line_designation] = line_primary_analysis
                         
-    #                 elif next_cell_note:
-    #                     full_formated_data_of_one_table['notes_data'][full_line_designation] = cell.text
-    #                     next_cell_note = False
+                    elif next_cell_note:
+                        full_formated_data_of_one_table['cuneiform_data'][f'note {full_line_designation}-{note_id}'] = cell.text
+                        full_formated_data_of_one_table['translation_data'][f'note {full_line_designation}-{note_id}'] = cell.text
+                        note_id += 1
+                    
+                elif i == 2 and not next_cell_note:
+                    """ The second column is for translation. """
+                    full_formated_data_of_one_table['translation_data'][full_line_designation] = cell.text
                                 
-    #     return full_formated_data_of_one_table
+        return full_formated_data_of_one_table
     
-    # elif layout == 'no_translation':
-    #     # TODO FINISH THIS!! 
-    #     for row in input_table.rows:
-    #         for i, cell in enumerate(row.cells):
-    #             if i == 0:
-    #                 if cell.text == '':
-    #                     """ If the first cell is empty it is line for translation. """
-    #                     next_cell_translation = True
-    #                     next_cell_note = False
-    #                     next_cell_cuneiform = False
+    elif layout == 'no_translation':
+        for row in input_table.rows:
+            for i, cell in enumerate(row.cells):
+                if i == 0:
+                    if cell.text == '':
+                        """ If the first cell is empty it is an error. """
+                        next_cell_note = False
+                        next_cell_cuneiform = False
+                        print('Error, lines must be designated!')
                         
-    #                 elif cell.text.lower() == 'note':
-    #                     """ If the first cell is 'note' it is line for note. """
-    #                     next_cell_note = True
-    #                     next_cell_translation = False
-    #                     next_cell_cuneiform = False
-    #                 else:
-    #                     next_cell_cuneiform = True
-    #                     next_cell_note = False
-    #                     next_cell_translation = False
-    #                     line_num = cell.text
-    #                     full_line_designation = sum_line_designation(rec_ver=rec_ver, column=column, line_num=line_num)
+                    elif cell.text.lower() == 'note':
+                        """ If the first cell is 'note' it is line for note. """
+                        next_cell_note = True
+                        next_cell_cuneiform = False
+                    else:
+                        next_cell_cuneiform = True
+                        next_cell_note = False
+                        line_num = cell.text
+                        full_line_designation = sum_line_designation(section=section, line_num=line_num)
                     
-    #             elif i == 1:
-    #                 if next_cell_translation:
-    #                     full_formated_data_of_one_table['translation_data'][full_line_designation] = cell.text
-    #                     next_cell_translation = False
-
-    #                 elif next_cell_cuneiform:
-    #                     cell_data = get_formatted_text_from_cell(input_cell_data=cell)
-    #                     line_primary_analysis = []
-    #                     for element in cell_data:
-    #                         element_info = assign_type(element)
-    #                         line_primary_analysis.append(element_info)
+                elif i == 1:
+                    if next_cell_cuneiform:
+                        cell_data = get_formatted_text_from_cell(input_cell_data=cell)
+                        line_primary_analysis = []
+                        for element in cell_data:
+                            element_info = assign_type(element)
+                            line_primary_analysis.append(element_info)
                             
-    #                     full_formated_data_of_one_table['cuneiform_data'][full_line_designation] = line_primary_analysis
-    #                     next_cell_translation = False
+                        full_formated_data_of_one_table['cuneiform_data'][full_line_designation] = line_primary_analysis
+                        full_formated_data_of_one_table['translation_data'][full_line_designation] = '---add translation---'
                         
-    #                 elif next_cell_note:
-    #                     full_formated_data_of_one_table['notes_data'][full_line_designation] = cell.text
-    #                     next_cell_note = False
+                    elif next_cell_note:
+                        full_formated_data_of_one_table['cuneiform_data'][f'note {full_line_designation}-{note_id}'] = cell.text
+                        full_formated_data_of_one_table['translation_data'][f'note {full_line_designation}-{note_id}'] = cell.text
+                        note_id += 1
                                 
-    #     return full_formated_data_of_one_table
+        return full_formated_data_of_one_table
     
     
 def get_headings_and_tables_from_document(input_document):
@@ -236,6 +227,8 @@ def get_headings_and_tables_from_document(input_document):
 def extract_data_from_composition_document(input_path, layout):
     """ This function analyses document that contains transcriptions of cuneiform texts. """
     # TODO: provide detail description of this function
+    # TODO: add functionality that ignores non-heading and non-tabular data
+    # TODO: add functionality that works without tables
 
     input_document = Document(input_path)
     
@@ -246,20 +239,11 @@ def extract_data_from_composition_document(input_path, layout):
     for section in document_headings_et_tables:
         heading = section['heading']
         table = section['table']
-
-        try:
-            rec_ver = heading.split(' ')[0]
-        except:
-            rec_ver = ''
-            
-        try:
-            column = heading.split(' ')[1]+' '+heading.split(' ')[2]
-        except:
-            column = heading
     
-        full_formated_data_of_one_table = get_formatted_text_from_table(input_table=table, rec_ver=rec_ver, column=column, layout=layout)
+        full_formated_data_of_one_table = get_formatted_text_from_table(input_table=table, section=heading, layout=layout)
         
         complete_analysed_document[heading] = full_formated_data_of_one_table
+        print(complete_analysed_document)
         
         # NOTE: printing individual lines in simple format
         for line in full_formated_data_of_one_table['cuneiform_data']:
@@ -268,6 +252,6 @@ def extract_data_from_composition_document(input_path, layout):
             else:
                 # print(full_formated_data_of_one_table[line])
                 line_text = simple_print_line_data(full_formated_data_of_one_table['cuneiform_data'][line])
-                print(line, line_text)
+                print(line, line_text, full_formated_data_of_one_table['translation_data'][line])
                 
     return complete_analysed_document
