@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const obverseReverseCheckbox = document.getElementById('ORACCObverseReverse');
     const columnsCheckbox = document.getElementById('ORACCColumns');
 
+    const analyzeButtonShowText = document.getElementById('analyze-show-text');
     const analyzeButtonSigns = document.getElementById('analyze-button-signs');
     const analyzeButtonWords = document.getElementById('analyze-button-words');
     const analyzeButtonGlossary = document.getElementById('analyze-button-glossary');
@@ -29,13 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let obverseReverseState = "False"
     let columnsState = "False"
 
+    analyzeButtonShowText.disabled = true;
     analyzeButtonSigns.disabled = true;
     analyzeButtonWords.disabled = true;
     analyzeButtonGlossary.disabled = true;
     analyzeButtonORACC.disabled = true;
-    downloadButtonCSV.disabled = true
-    downloadButtonXLSX.disabled = true
-    downloadButtonATF.disabled = true
+    downloadButtonCSV.disabled = true;
+    downloadButtonXLSX.disabled = true;
+    downloadButtonATF.disabled = true;
 
     dropZone.addEventListener('click', () => fileInput.click());
 
@@ -100,6 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    analyzeButtonShowText.addEventListener('click', (event) => {
+        event.preventDefault();
+        renderDocument();
+    });
+    
     analyzeButtonSigns.addEventListener('click', (event) => {
         event.preventDefault();
         analyzeSigns();
@@ -194,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         errors.style.display = 'none'
                         output.textContent = `File uploaded: ${file.name}`;
                         currentUploadId = jsonResult.upload_id;
+                        analyzeButtonShowText.disabled = false;
                         analyzeButtonSigns.disabled = false;
                         analyzeButtonWords.disabled = false;
                         analyzeButtonGlossary.disabled = false;
@@ -214,6 +222,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             output.textContent = 'Please select a file first.';
+        }
+    }
+
+    async function renderDocument() {
+        console.log('Rendering document');
+
+        if (!currentUploadId) {
+            output.textContent = 'Please upload a file first.';
+            return;
+        }
+        try {
+            const response = await fetch(`${SERVER_URL}/render_document/${currentUploadId}`, {
+                method: 'POST',
+                });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const signs_results = await response.text();
+            console.log('Full response received. Size:', signs_results.length);
+            console.log('Parsing JSON...');
+            const jsonResult = JSON.parse(signs_results);
+            console.log('JSON parsed successfully.');
+
+            document.getElementById('basic-output').innerHTML = jsonResult.analysis;
+
+            errors.style.display = 'none'
+
+            downloadButtonATF.disabled = true
+            downloadButtonCSV.disabled = true
+            downloadButtonXLSX.disabled = true
+
+            currentAnalysis = 'document_render'
+
+        } catch (error) {
+            console.error('Error:', error);
+            output.textContent = `Error: ${error.message}`;
         }
     }
 

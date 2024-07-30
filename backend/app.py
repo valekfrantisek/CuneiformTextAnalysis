@@ -68,9 +68,10 @@ def upload_file(layout):
             upload_id = str(uuid.uuid4())
             
             file_buffer = BytesIO(file_content)
-            processed_file = extract_data_from_composition_document(file_buffer, layout)
+            processed_file, file_in_html = extract_data_from_composition_document(file_buffer, layout)
             
-            cache.set(f'upload_{upload_id}', json.dumps(processed_file), timeout=3600)  # timeout in seconds
+            cache.set(f'upload_{upload_id}', json.dumps(processed_file), timeout=3600)
+            cache.set(f'upload_html_{upload_id}', json.dumps(file_in_html), timeout=3600)
             
             logging.debug(f"File content saved to cache with key: upload_{upload_id}")
             
@@ -80,6 +81,18 @@ def upload_file(layout):
         logging.error(f'Error in upload_file: {str(e)}')
         logging.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/render_document/<upload_id>', methods=['POST'])
+def render_document(upload_id):
+    document_as_html = json.loads(cache.get(f'upload_html_{upload_id}'))
+    if not document_as_html:
+        return jsonify({'error': 'File not found'}), 404
+
+    response_data = {'success': True, 'analysis': document_as_html, 'syntax_errors': 'None'}
+    response_json = json.dumps(response_data, ensure_ascii=False)
+    
+    return response_json, 200
 
 
 @app.route('/analyzeSignsAction/<upload_id>', methods=['POST'])
@@ -101,8 +114,6 @@ def analyse_signs(upload_id):
 
     response_data = {'success': True, 'analysis': signs_used_in_manuscript, 'syntax_errors': manuscript_syntax_error_report}
     response_json = json.dumps(response_data, ensure_ascii=False)
-    
-    # TODO: CONTINUE HERE!! Add to JS!!
     
     return response_json, 200
 

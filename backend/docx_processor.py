@@ -224,6 +224,55 @@ def get_headings_and_tables_from_document(input_document):
     return document_data
 
 
+def tag_cell_elem_html(formatted_data:dict):
+    """ This function transforms the formatting of the analysed text (element in a cell) to html. """
+    text = formatted_data['text']
+    if formatted_data['italic']:
+        return f'<i>{text}</i>'
+    elif formatted_data['small caps']:
+        if formatted_data['superscript']:
+            return f'<sup><font style="font-variant: small-caps">{text}</font></sup>'
+        if formatted_data['subscript']:
+            return f'<sub><font style="font-variant: small-caps">{text}</font></sub>'
+        else:
+            return f'<font style="font-variant: small-caps">{text}</font>'
+    elif formatted_data['superscript'] and ':' in text:
+        return f'<sup>{text}</sup>'
+    elif formatted_data['subscript']:
+        return f'<sub>{text}</sub>'
+    elif formatted_data['uppercase']:
+        return text.upper()
+    else:
+        return text
+
+
+def get_html_from_table(input_table, heading):
+    final_html_text = f'<h4>{heading}</h4><table class="cuneiform-table">'
+    
+    for row in input_table.rows:
+        final_html_text += '<tr>'
+        for cell in row.cells:
+            final_html_text += '<td>'
+            formatted_data_from_cell = get_formatted_text_from_cell(cell)
+            for from_cell_elem in formatted_data_from_cell:
+                final_html_text += tag_cell_elem_html(from_cell_elem)      
+            final_html_text += '</td>'
+        final_html_text += '</tr>'
+    final_html_text += '</table>'   
+    
+    return final_html_text
+
+
+def transform_docx_to_html_table(document_headings_et_tables):
+    full_html_document = ''
+    for section in document_headings_et_tables:
+        heading = section['heading']
+        table = section['table']
+        full_html_document += get_html_from_table(input_table=table, heading=heading)
+    
+    return full_html_document
+
+
 def extract_data_from_composition_document(input_path, layout):
     """ This function analyses document that contains transcriptions of cuneiform texts. """
     # TODO: provide detail description of this function
@@ -253,4 +302,6 @@ def extract_data_from_composition_document(input_path, layout):
                 line_text = simple_print_line_data(full_formated_data_of_one_table['cuneiform_data'][line])
                 print(line, line_text, full_formated_data_of_one_table['translation_data'][line])
                 
-    return complete_analysed_document
+    document_in_html = transform_docx_to_html_table(document_headings_et_tables=document_headings_et_tables)
+                
+    return complete_analysed_document, document_in_html

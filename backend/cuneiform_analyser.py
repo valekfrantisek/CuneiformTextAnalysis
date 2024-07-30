@@ -8,10 +8,15 @@ from unidecode import unidecode
 import re
 import statistics
 
-version = '0.0.1'
+version = 'BETA 0.0.1'
 authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_web = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
+
+# TODO: add possibility to render the uploaded document as tables
+# TODO: sign analysis - columns on signs with ! and ?
+# TODO: Finish and implement calculating line len from preserved lines.
+# TODO: incorporate MZL sign numbers
 
 
 """ SIGN ANALYSIS -------------------------------------------------------------------------------------------------------------------- """
@@ -614,13 +619,12 @@ def extract_word_from_normalised_line(input_line_text:str):
     return final_words_attestations
 
 
-def extract_attested_forms_from_manuscript(input_data):
+def extract_attested_forms_from_manuscript(input_data:dict):
     """
     This function extracts data about attested forms of words/elements from a given manuscript. Post/Determinatives are recognised as part of the whole word. Reconstructions, additions, etc. are preserved in the attestation form. The data are then sorted alphabetically.
 
     Args:
         input_data (dict): manuscript object created wit function extract_data_from_composition_document(input_document).
-        csv_out_path (str): path to the CSV file where the data should be stored. Note that the file will be overwritten!!
     """
     
     forms_on_lines = defaultdict(list)
