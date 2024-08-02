@@ -5,7 +5,6 @@ authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_web = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
 
-
 def load_document(input_path):
     """ This function loads the document for further analysis. """
     manuscript_document = Document(input_path)
@@ -23,15 +22,13 @@ def assign_type(formatted_data:dict):
         return {'text': text, 'type': 'syllabic'}
     elif formatted_data['superscript'] and ':' in text:
         return {'text': text, 'type': 'manuscript designation'}
-    elif formatted_data['small caps']:
+    elif formatted_data['small caps'] or formatted_data['uppercase']:
         if formatted_data['superscript']:
             return {'text': text, 'type': 'post/determinative'}
         if formatted_data['subscript']:
             return {'text': text, 'type': 'sign number'}
         else:
             return {'text': text, 'type': 'ideo/logographic'}
-    elif formatted_data['uppercase']:
-        return {'text': text, 'type': 'sign_value'}
     else:
         # print('Check this one', text)
         return {'text': text, 'type': 'other'}
@@ -236,7 +233,7 @@ def tag_cell_elem_html(formatted_data:dict):
             return f'<sub><font style="font-variant: small-caps">{text}</font></sub>'
         else:
             return f'<font style="font-variant: small-caps">{text}</font>'
-    elif formatted_data['superscript'] and ':' in text:
+    elif formatted_data['superscript']:
         return f'<sup>{text}</sup>'
     elif formatted_data['subscript']:
         return f'<sub>{text}</sub>'

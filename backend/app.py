@@ -6,7 +6,7 @@ project_name = 'CuneiformTextAnalysis'
 project_git = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
 project_web = 'https://dh-tools.cz/CuneiformTextAnalysis'
 
-from flask import Flask, request, jsonify, send_from_directory, Response
+from flask import Flask, request, jsonify, send_from_directory, Response, redirect
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from cachelib import SimpleCache
@@ -44,6 +44,11 @@ def log_response_info(request):
 @app.route('/')
 def serve_frontend():
     return send_from_directory(app.static_folder, 'index.html')
+
+
+# @app.route('/')
+# def serve_frontend():
+#     return redirect('https://dh-tools.eu/CTA/')
 
 
 @app.route('/upload/<layout>', methods=['POST'])

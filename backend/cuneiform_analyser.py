@@ -13,6 +13,7 @@ authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_web = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
 
+# TODO: chamge ORACC rendering so as the determinatives are in lowercase but used ideograms in uppercase!!
 # TODO: add possibility to render the uploaded document as tables
 # TODO: sign analysis - columns on signs with ! and ?
 # TODO: Finish and implement calculating line len from preserved lines.
