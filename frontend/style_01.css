@@ -333,6 +333,10 @@ tr:hover {
     text-decoration: none;
 }
 
+.footer-content a:hover {
+    color: #2980b9;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .container {
