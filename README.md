@@ -9,6 +9,8 @@ version: 1.0.1
 
 publised: 30 December 2024
 
+license: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
+
 ## Available Functions
 ### Cuneiform text from MS Word analysis
 The scriprt enables analysis of transcribed cuneiform texts in Word, structured in tables. So far, it is able to analyse text where transcribed text and translation are structured in lines or in columns. It is also able to analyse cuneiform text without translation.
