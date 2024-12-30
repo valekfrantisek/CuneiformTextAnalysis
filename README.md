@@ -6,6 +6,7 @@ The project is also served at [https://dh-tools.eu/CTA/](https://dh-tools.eu/CTA
 
 ## Current Version
 version: 1.0.1
+
 publised: 30 December 2024
 
 ## Available Functions
