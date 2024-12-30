@@ -5,15 +5,15 @@ This repository contains scripts for online app Cuneiform Text Analyser. The scr
 The project is also served at [https://dh-tools.eu/CTA/](https://dh-tools.eu/CTA/).
 
 ## Current Version
-author: František Válek ([KFR FF UPCE](https://kfr.upce.cz/en/frantisek-valek))
-
-contact: [frantisek.valek@upce.cz](mailto:frantisek.valek@upce.cz)
-
 version: 1.0.1
 
 publised: 30 December 2024
 
 license: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
+
+author: František Válek ([KFR FF UPCE](https://kfr.upce.cz/en/frantisek-valek))
+
+contact: [frantisek.valek@upce.cz](mailto:frantisek.valek@upce.cz)
 
 ## Available Functions
 ### Cuneiform text from MS Word analysis
