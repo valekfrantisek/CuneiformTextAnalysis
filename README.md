@@ -5,7 +5,7 @@ This repository contains scripts for online app Cuneiform Text Analyser. The scr
 The project is also served at [https://dh-tools.eu/CTA/](https://dh-tools.eu/CTA/).
 
 ## Current Version
-version: 1.0.1
+version: 1.0.0
 
 publised: 30 December 2024
 
