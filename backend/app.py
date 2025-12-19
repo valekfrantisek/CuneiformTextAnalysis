@@ -26,7 +26,8 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__, static_folder='../frontend')
 CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 
-cache = SimpleCache()
+cache = SimpleCache(treshold=64)
+CACHE_TIMEOUT = 3600  # seconds
 
 ALLOWED_EXTENSIONS = {'docx'}
 
@@ -38,9 +39,9 @@ def log_request_info():
     logging.debug('LOG Before request')
 
 @app.after_request
-def log_response_info(request):
-    logging.debug('LOG After request')
-    return request
+def log_response_info(response):
+    logging.info(f"{request.method} {request.path} -> {response.status_code}")
+    return response
 
 @app.route('/')
 def serve_frontend():
@@ -71,8 +72,8 @@ def upload_file(layout):
             file_buffer = BytesIO(file_content)
             processed_file, file_in_html = extract_data_from_composition_document(file_buffer, layout)
             
-            cache.set(f'upload_{upload_id}', json.dumps(processed_file), timeout=3600)
-            cache.set(f'upload_html_{upload_id}', json.dumps(file_in_html), timeout=3600)
+            cache.set(f'upload_{upload_id}', json.dumps(processed_file), timeout=CACHE_TIMEOUT)
+            cache.set(f'upload_html_{upload_id}', json.dumps(file_in_html), timeout=CACHE_TIMEOUT)
             
             logging.debug(f"File content saved to cache with key: upload_{upload_id}")
             
@@ -111,7 +112,7 @@ def analyse_signs(upload_id):
     
     signs_used_in_manuscript = dict(sorted(signs_used_in_manuscript.items()))
     
-    cache.set(f'signs_{upload_id}', json.dumps(signs_used_in_manuscript), timeout=3600)
+    cache.set(f'signs_{upload_id}', json.dumps(signs_used_in_manuscript), timeout=CACHE_TIMEOUT)
 
     response_data = {'success': True, 'analysis': signs_used_in_manuscript, 'syntax_errors': manuscript_syntax_error_report}
     response_json = json.dumps(response_data, ensure_ascii=False)
@@ -129,7 +130,7 @@ def analyze_words(upload_id):
     
     word_forms_table_data = get_table_of_words(reconstructed_words_used_in_dataset, partially_reconstructed_words_used_in_dataset, preserved_words_used_in_dataset, full_words_used_in_dataset)
     
-    cache.set(f'words_{upload_id}', json.dumps(word_forms_table_data), timeout=3600)
+    cache.set(f'words_{upload_id}', json.dumps(word_forms_table_data), timeout=CACHE_TIMEOUT)
     
     response_data = {'success': True, 'analysis': word_forms_table_data, 'syntax_errors': 'None'}
     response_json = json.dumps(response_data, ensure_ascii=False)
@@ -145,7 +146,7 @@ def analyze_glossary(upload_id):
     
     glossary_dict = extract_attested_forms_from_manuscript(input_data=processed_file)
     
-    cache.set(f'glossary_{upload_id}', json.dumps(glossary_dict), timeout=3600)
+    cache.set(f'glossary_{upload_id}', json.dumps(glossary_dict), timeout=CACHE_TIMEOUT)
     
     response_data = {'success': True, 'analysis': glossary_dict, 'syntax_errors': 'None'}
     response_json = json.dumps(response_data, ensure_ascii=False)
@@ -182,7 +183,7 @@ def analyze_ORACC(upload_id):
     
     oracc_output_data, error_report = oraccise_document(processed_file, rec_vers=rec_vers, cols=cols)
     
-    cache.set(f'oracc_{upload_id}', json.dumps(oracc_output_data), timeout=3600)    
+    cache.set(f'oracc_{upload_id}', json.dumps(oracc_output_data), timeout=CACHE_TIMEOUT)    
     
     oracc_data_as_html = oracc_output_data.replace('\n', '<br>')
     oracc_data_as_html = f'<p class="oracc-output">{oracc_data_as_html}</p>'
