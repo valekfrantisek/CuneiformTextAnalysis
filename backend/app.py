@@ -1,10 +1,11 @@
 """ This is a Flask app for the CuneiformTextAnalysis project. It facilitates functions for the cuneiform transliterated text analysis. """
 
-version = 'BETA 0.0.1'
+version = '1.0.2'
 authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_git = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
-project_web = 'https://dh-tools.cz/CuneiformTextAnalysis'
+project_web = 'https://digitalhumanities.upce.cz/CTA'
+# NOTE: This version is made to be run locally with Flask setup.
 
 from flask import Flask, request, jsonify, send_from_directory, Response, redirect
 from flask_cors import CORS
@@ -44,11 +45,6 @@ def log_response_info(request):
 @app.route('/')
 def serve_frontend():
     return send_from_directory(app.static_folder, 'index.html')
-
-
-# @app.route('/')
-# def serve_frontend():
-#     return redirect('https://dh-tools.eu/CTA/')
 
 
 @app.route('/upload/<layout>', methods=['POST'])
