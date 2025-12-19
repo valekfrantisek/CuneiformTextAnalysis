@@ -8,7 +8,7 @@ from unidecode import unidecode
 import re
 import statistics
 
-version = '1.0.1'
+version = '1.0.2'
 authors = ['František Válek']
 project_name = 'CuneiformTextAnalysis'
 project_web = 'https://github.com/valekfrantisek/CuneiformTextAnalysis'
