@@ -26,10 +26,12 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__, static_folder='../frontend')
 CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 
-cache = SimpleCache(treshold=64)
+cache = SimpleCache(threshold=64)
 CACHE_TIMEOUT = 3600  # seconds
+app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = {'docx'}
+MAX_UPLOAD = 20 * 1024 * 1024  # 20 MB
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -51,6 +53,9 @@ def serve_frontend():
 @app.route('/upload/<layout>', methods=['POST'])
 def upload_file(layout):
     logging.debug('Upload called')
+
+    if request.content_length is not None and request.content_length > MAX_UPLOAD:
+        return jsonify({"error": "Upload is too large (max 20 MB)."}), 413
     
     try:
         if 'file' not in request.files:
