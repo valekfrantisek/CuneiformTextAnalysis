@@ -2,12 +2,12 @@
 
 This repository contains scripts for online app Cuneiform Text Analyser. The scripts provided here are built to run this app on your own computer.
 
-The project is also served at [https://dh-tools.eu/CTA/](https://dh-tools.eu/CTA/).
+The project is also served at [https://digitalhumanities.upce.cz/CTA/](https://digitalhumanities.upce.cz/CTA/).
 
 ## Current Version
-version: 1.0.0
+version: 1.0.2
 
-publised: 30 December 2024
+publised: 19 December 2025 (first version published 30 December 2024)
 
 license: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
 
